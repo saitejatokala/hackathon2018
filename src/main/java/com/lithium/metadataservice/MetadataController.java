@@ -34,8 +34,57 @@ public class MetadataController {
 	// Create a new MetaData
 	@PostMapping("/metadata")
 	public MetaData createNote(@Valid @RequestBody MetaData metaData) {
+
 		return metaDataRepository.save(metaData);
 	}
+
+	// Get All Notes
+	@PostMapping("/metadataBatch")
+	public List<MetaData> getMetadataBatch(@RequestBody MetaDataPojo metaDataPojo) {
+		final Integer nodeId = metaDataPojo.getNodeId();
+		final String nodeName = metaDataPojo.getNodeName();
+		final Integer authorOfMetadata = metaDataPojo.getAuthorOfMetadata();
+
+		final String tenantId = metaDataPojo.getTenantId();
+		final String metadataType = metaDataPojo.getMetadataType();
+		if(nodeId !=null && nodeName !=null && authorOfMetadata !=null && tenantId !=null && metadataType !=null){
+			return metaDataRepository.findByNodeIdAndNodeNameAndAuthorOfMetadataAndTenantIdAndMetadataType(nodeId, nodeName, authorOfMetadata, tenantId, metadataType);
+		}
+		if(nodeId !=null && nodeName !=null && authorOfMetadata !=null && tenantId !=null){
+			return metaDataRepository.findByNodeIdAndNodeNameAndAuthorOfMetadataAndTenantId(nodeId, nodeName, authorOfMetadata, tenantId);
+		}
+		if(nodeId !=null && nodeName !=null && authorOfMetadata !=null){
+			return metaDataRepository.findByNodeIdAndNodeNameAndAuthorOfMetadata(nodeId, nodeName, authorOfMetadata);
+		}
+		if(nodeId !=null && nodeName !=null){
+			return metaDataRepository.findByNodeIdAndNodeName(nodeId, nodeName);
+		}
+		if(nodeId !=null){
+			return metaDataRepository.findByNodeId(nodeId);
+		}
+
+//		if(metaDataPojo.getNodeId()!=null){
+//			return metaDataRepository.findByNodeId(metaDataPojo.getNodeId());
+//		}
+
+
+		//return metaDataRepository.findByNodeIdAndNodeName(metaDataPojo.getNodeId(),metaDataPojo.getNodeName());
+		return metaDataRepository.findByNodeIdAndNodeNameAndAuthorOfMetadataAndTenantIdAndMetadataType(metaDataPojo.getNodeId(),metaDataPojo.getNodeName(),metaDataPojo.getAuthorOfMetadata(),metaDataPojo.getTenantId(),metaDataPojo.getTenantId());
+	}
+
+//	@RequestMapping(method = RequestMethod.GET, value = "/metadata")
+//	@ResponseBody
+//	public List<User> search(@RequestParam(value = "search") String search) {
+//		MetaDataSpecificationsBuilder builder = new MetaDataSpecificationsBuilder();
+//		Pattern pattern = Pattern.compile("(\w+?)(:|<|>)(\w+?),");
+//		Matcher matcher = pattern.matcher(search + ",");
+//		while (matcher.find()) {
+//			builder.with(matcher.group(1), matcher.group(2), matcher.group(3));
+//		}
+//
+//		Specification<User> spec = builder.build();
+//		return repo.findAll(spec);
+//	}
 
 	// Get All Notes
 	@GetMapping("/metadata")
@@ -53,25 +102,7 @@ public class MetadataController {
 		return ResponseEntity.ok().body(metaData);
 	}
 
-	// Update a MetaData
-	@PutMapping("/metadata/{id}")
-	public ResponseEntity<MetaData> updateNote(@PathVariable(value = "id") Long metadataId,
-			@Valid @RequestBody MetaData metaDataDetails) {
-		MetaData metaData = metaDataRepository.findOne(metadataId);
-		if(metaData == null) {
-			return ResponseEntity.notFound().build();
-		}
-		metaData.setNodeId(metaDataDetails.getNodeId());
-		metaData.setAuthorOfMetadata(metaDataDetails.getAuthorOfMetadata());
-		metaData.setMetadataType(metaDataDetails.getMetadataType());
-		metaData.setNodeAuthor(metaDataDetails.getNodeAuthor());
-		metaData.setNodeName(metaDataDetails.getNodeName());
-		metaData.setTenantId(metaDataDetails.getTenantId());
-		metaData.setSystemGenerated(metaDataDetails.isSystemGenerated());
 
-		MetaData updatedMetaData = metaDataRepository.save(metaData);
-		return ResponseEntity.ok(updatedMetaData);
-	}
 
 	// Delete a MetaData
 	@DeleteMapping("/metadata/{id}")
